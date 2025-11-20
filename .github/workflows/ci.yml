@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11']  # три версии Python
+        python-version: ['3.9', '3.10', '3.11']
       fail-fast: false
 
     steps:
@@ -37,17 +37,14 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Run tests (pytest)
-        # Предполагаем, что проект использует pytest; подставь команду, если другая
+      - name: Run unit tests
         run: |
-          pip install pytest || true
-          pytest --maxfail=1 -q
+          python -m unittest tests.py
 
   build-docker:
     name: Build Docker image (only if tests passed)
     runs-on: ubuntu-latest
     needs: test
-    # Запустится только если все matrix задач из job "test" завершились успешно.
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -64,4 +61,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
-          tags: my-app:ci-build  # локальный тег внутри раннера; поменяй при необходимости
+          tags: my-app:ci-build
